@@ -5,6 +5,7 @@ import * as LucideIcons from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeProvider";
 import Dashboard from "../screens/app/admin/Dashboard";
 import Customers from "../screens/app/admin/Customers";
+import Invoice from "../screens/app/admin/Invoice";
 import Measurements from "../screens/app/admin/Measurements";
 import Settings from "../screens/app/admin/Settings";
 import TabHeader from "../components/TabHeader";
@@ -60,6 +61,17 @@ export default function TabNavigator() {
                         header: () => <TabHeader title="Customers" />,
                         tabBarIcon: ({ focused }) => (
                             <TabIcon name="Users" focused={focused} />
+                        ),
+                    }}
+                />
+
+                <Tab.Screen
+                    name="Invoice"
+                    component={Invoice}
+                    options={{
+                        header: () => <TabHeader title="Invoice" />,
+                        tabBarIcon: ({ focused }) => (
+                            <TabIcon name="ReceiptText" focused={focused} />
                         ),
                     }}
                 />

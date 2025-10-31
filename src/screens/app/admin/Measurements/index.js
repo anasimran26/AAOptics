@@ -9,11 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Chip } from "react-native-paper";
 import ActionSheet from "react-native-actions-sheet";
 import Toast from "react-native-toast-message";
 import { useTheme } from "../../../../contexts/ThemeProvider";
+import { useAds } from "../../../../contexts/ads/AdManager";
 import {
   fetchMeasurements,
   fetchCustomers,
@@ -37,6 +37,7 @@ export default function Measurements() {
   const [loading, setLoading] = useState(true);
   const actionSheetRef = useRef(null);
   const units = ["Inches", "Cm", "Mtr", "Yrd", "Ft"].map((n, i) => ({ id: i + 1, name: n }));
+  const { showRewardedInterstitial } = useAds();
 
 
   const showToast = (text) => Toast.show({ type: "custom", text1: text });
@@ -119,6 +120,16 @@ export default function Measurements() {
   const handleSaveMeasurement = async () => {
     if (!selectedCustomer || !selected) return showToast("Select Customer!");
     try {
+      const result = await showRewardedInterstitial();
+      if (result.earned) {
+        console.log("User earned:", result.reward);
+      } else {
+        console.log("No reward (ad closed or not granted)");
+      }
+    } catch (err) {
+      console.warn("Rewarded ad failed:", err);
+    }
+    try {
       const m = measurements.find((m) => m.name === selected);
       if (!m) return showToast("Measurement not found!");
       const r = await saveCustomerMeasurement(selectedCustomer.id, {
@@ -128,12 +139,16 @@ export default function Measurements() {
         userattributes: attributeValues,
       });
       showToast(
-        r?.status ? "Measurement saved successfully!" : "Failed to save measurement"
+        r?.status
+          ? "Measurement saved successfully!"
+          : "Failed to save measurement"
       );
     } catch {
       showToast("Error saving measurement");
     }
   };
+
+
 
   const handleSelectMeasurement = async (name) => {
     setSelected(name);
@@ -167,14 +182,14 @@ export default function Measurements() {
   );
 
   return (
-    <SafeAreaView className="flex-1 px-5" style={{ backgroundColor: theme.bg }}>
+    <View className="flex-1 px-5" style={{ backgroundColor: theme.bg }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 80 }}
+          contentContainerStyle={{ paddingBottom: 80, marginTop: 25, }}
         >
           {/* Measurement Tabs */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -434,6 +449,6 @@ export default function Measurements() {
           </View>
         </View>
       </ActionSheet>
-    </SafeAreaView>
+    </View>
   );
 }

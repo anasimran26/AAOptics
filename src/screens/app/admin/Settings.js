@@ -138,11 +138,11 @@ export default function Settings() {
       />
 
       {/* Logout */}
-      <SectionButton
+      {/* <SectionButton
         title="Logout"
         onPress={() => setShowLogoutModal(true)}
         icon="log-out-outline"
-      />
+      /> */}
 
       {/* Currency Action Sheet */}
       <ActionSheet

@@ -106,6 +106,22 @@ export const showCustomer = (id) => handleResponse(client.get(`/admin/customers/
 // Update Customer 
 export const updateCustomer = (id, payload) => handleResponse(client.put(`admin/customers/update/${id}`, payload));
 
+// Products
+export const fetchProducts = () => handleResponse(client.get("/admin/products"));
+
+// Create Products
+export const createProducts = (payload) => handleResponse(client.post("/admin/products/create", payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+}));
+
+// Product Toggle
+export const productToggle = (id) => handleResponse(client.patch(`/admin/products/${id}/toggle`));
+
+// Update Product 
+export const updateProduct = (id, payload) => handleResponse(client.post(`/admin/products/${id}/update?_method=PUT`, payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+}));
+
 // Measurements
 export const fetchMeasurements = () => handleResponse(client.get("/admin/measurements"));
 
@@ -117,6 +133,9 @@ export const fetchCustomerMeasurementDetails = (customerId, measurementId) => ha
 
 // Save Customer Measurement
 export const saveCustomerMeasurement = (customerId, payload) => handleResponse(client.post(`/admin/customers/${customerId}/measurements/create`, payload));
+
+// Create Invoice 
+export const createInvoice = (payload) => handleResponse(client.post("/admin/invoice/create", payload));
 
 // Invoice Setting
 export const fetchInvoiceSetting = () => handleResponse(client.get("/admin/settings/invoice"));
@@ -134,7 +153,7 @@ export const measurementTypeToggle = (id) => handleResponse(client.patch(`/admin
 export const measurementTypeCreate = (payload) => handleResponse(client.post("/admin/measurements/create", payload));
 
 // Measurement Types Update 
-export const measurementTypeUpdate = (id, payload) => handleResponse(client.put(`/admin/measurements/${id}/update`, payload));             
+export const measurementTypeUpdate = (id, payload) => handleResponse(client.put(`/admin/measurements/${id}/update`, payload));
 
 // Measurement Setting
 export const fetchMeasurementSetting = () => handleResponse(client.get("/admin/settings/measurements"));

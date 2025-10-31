@@ -10,10 +10,10 @@ import {
     Modal,
     TouchableWithoutFeedback,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Edit2 } from "lucide-react-native";
 import Toast from "react-native-toast-message";
 import { useTheme } from "../../../../contexts/ThemeProvider";
+import { useAds } from "../../../../contexts/ads/AdManager";
 import {
     fetchCustomers,
     createCustomer,
@@ -36,6 +36,7 @@ export default function Customers() {
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
+    const { showRewardedInterstitial } = useAds();
 
     const showToast = (text) => Toast.show({ type: "custom", text1: text });
 
@@ -93,13 +94,22 @@ export default function Customers() {
                 date: new Date().toISOString().split("T")[0],
             };
 
+            try {
+                const result = await showRewardedInterstitial();
+                if (result.earned) {
+                    console.log("User earned:", result.reward);
+                } else {
+                    console.log("No reward (ad closed or not granted)");
+                }
+            } catch (err) {
+                console.warn("Rewarded ad failed:", err);
+            }
+
             if (editMode && selectedId) {
                 const res = await updateCustomer(selectedId, payload);
                 if (res.status) {
                     setCustomers((prev) =>
-                        prev.map((c) =>
-                            c.id === selectedId ? { ...c, ...payload } : c
-                        )
+                        prev.map((c) => (c.id === selectedId ? { ...c, ...payload } : c))
                     );
                     showToast("Customer updated successfully");
                 } else showToast("Failed to update customer");
@@ -235,7 +245,7 @@ export default function Customers() {
     );
 
     return (
-        <SafeAreaView
+        <View
             className="flex-1"
             style={{ backgroundColor: theme.bg }}
         >
@@ -247,6 +257,7 @@ export default function Customers() {
                     contentContainerStyle={{
                         paddingHorizontal: 14,
                         paddingBottom: 80,
+                        marginTop: 25,
                     }}
                     keyboardShouldPersistTaps="handled"
                 >
@@ -472,6 +483,6 @@ export default function Customers() {
                     </Modal>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
     );
 }

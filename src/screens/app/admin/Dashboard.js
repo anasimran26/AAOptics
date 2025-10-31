@@ -115,7 +115,6 @@ export default function Dashboard() {
         >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View>
-              {/* ===== Header Row ===== */}
               <View
                 className="flex-row border-b"
                 style={{
@@ -150,7 +149,7 @@ export default function Dashboard() {
                           key={j}
                           className="px-4 py-3 justify-center"
                           style={{
-                            width: j === 0 ? 70 : 110,
+                            width: j === 0 ? 90 : 100,
                             alignItems: j === 3 ? "flex-end" : "flex-start",
                           }}
                         >
@@ -184,7 +183,7 @@ export default function Dashboard() {
                         width: 70,
                       }}
                     >
-                      {index + 1}
+                      {sale.id || "—"}
                     </Text>
 
                     <Text

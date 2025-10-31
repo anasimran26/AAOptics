@@ -3,23 +3,74 @@ import { useEffect, useState } from "react";
 import * as Font from "expo-font";
 import { useColorScheme } from "react-native";
 import RootNavigator from "./src/navigation/root";
-import { AuthProvider } from "./src/contexts/AuthContext";
+import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import { CurrencyProvider } from "./src/contexts/CurrencyContext";
 import { ThemeProvider } from "./src/contexts/ThemeProvider";
 import Toast, { BaseToast } from "react-native-toast-message";
+import api from "./src/api";
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import mobileAds from "react-native-google-mobile-ads";
+import { AdsProvider } from "./src/contexts/ads/AdManager";
+
+
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
+
+function AutoLoginWrapper({ children }) {
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const autoLogin = async () => {
+      try {
+        const payload = {
+          email: "admin@admin.com",
+          password: "123456",
+        };
+        const res = await api.auth.login(payload);
+        if (res.status) {
+          login(res);
+        } else {
+          console.warn("Auto-login failed:", res.message);
+        }
+      } catch (err) {
+        console.warn("Auto-login error:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    autoLogin();
+  }, []);
+
+  if (loading) return null;
+
+  return children;
+}
 
 export default function App() {
   const colorScheme = useColorScheme();
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
+    mobileAds()
+      .initialize()
+      .then((adapterStatuses) => {
+        console.log("AdMob initialized", adapterStatuses);
+      });
+  }, []);
+
+  useEffect(() => {
     async function loadResources() {
       try {
         await Font.loadAsync({
-          "Regular": require("./src/assets/fonts/Outfit-Regular.ttf"),
-          "Medium": require("./src/assets/fonts/Outfit-Medium.ttf"),
-          "SemiBold": require("./src/assets/fonts/Outfit-SemiBold.ttf"),
-          "Bold": require("./src/assets/fonts/Outfit-Bold.ttf"),
+          Regular: require("./src/assets/fonts/Outfit-Regular.ttf"),
+          Medium: require("./src/assets/fonts/Outfit-Medium.ttf"),
+          SemiBold: require("./src/assets/fonts/Outfit-SemiBold.ttf"),
+          Bold: require("./src/assets/fonts/Outfit-Bold.ttf"),
         });
         setAppIsReady(true);
       } catch (e) {
@@ -51,13 +102,18 @@ export default function App() {
   };
 
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <CurrencyProvider>
-          <RootNavigator />
-          <Toast config={toastConfig} />
-        </CurrencyProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <AdsProvider showAppOpenOnForeground={true}>
+      <AuthProvider>
+        <AutoLoginWrapper>
+          <ThemeProvider>
+            <CurrencyProvider>
+              <RootNavigator />
+              <Toast config={toastConfig} />
+            </CurrencyProvider>
+          </ThemeProvider>
+        </AutoLoginWrapper>
+      </AuthProvider>
+    </AdsProvider>
+
   );
 }
