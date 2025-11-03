@@ -30,13 +30,13 @@ export default function Measurements() {
   const [customers, setCustomers] = useState([]);
   const [measurements, setMeasurements] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [selectedUnit, setSelectedUnit] = useState({ id: 1, name: "mm" });
+  const [selectedUnit, setSelectedUnit] = useState({ id: 1, name: "Diopter(D)" });
   const [notes, setNotes] = useState("");
   const [attributes, setAttributes] = useState([]);
   const [attributeValues, setAttributeValues] = useState({});
   const [loading, setLoading] = useState(true);
   const actionSheetRef = useRef(null);
-  const units = ["Inches", "Cm", "Mtr", "Yrd", "Ft"].map((n, i) => ({ id: i + 1, name: n }));
+  const units = ["Diopter(D)", "Degree", "Millimeter"].map((n, i) => ({ id: i + 1, name: n }));
   const { showRewardedInterstitial } = useAds();
 
 
